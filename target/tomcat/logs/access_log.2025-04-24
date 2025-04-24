@@ -1,0 +1,4 @@
+0:0:0:0:0:0:0:1 - - [24/Apr/2025:11:53:07 +0200] "POST /CINEPROJ/api/auth/login HTTP/1.1" 200 - http-bio-8080-exec-2 960
+0:0:0:0:0:0:0:1 - - [24/Apr/2025:11:53:54 +0200] "POST /CINEPROJ/api/auth/register HTTP/1.1" 201 29 http-bio-8080-exec-3 209
+0:0:0:0:0:0:0:1 - - [24/Apr/2025:11:54:03 +0200] "POST /CINEPROJ/api/auth/login HTTP/1.1" 400 27 http-bio-8080-exec-4 182
+0:0:0:0:0:0:0:1 - - [24/Apr/2025:11:54:07 +0200] "POST /CINEPROJ/api/auth/login HTTP/1.1" 200 - http-bio-8080-exec-6 154
