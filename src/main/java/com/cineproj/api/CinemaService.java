@@ -51,6 +51,7 @@ public class CinemaService {
 	}
 	
 	@GET
+	@Path("/{id}")
 	public Response getCinemaById(@QueryParam("id") String id) {
 		Cinema cinema;
 		try {

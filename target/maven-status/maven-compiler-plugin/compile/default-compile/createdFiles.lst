@@ -1,5 +1,8 @@
 com\cineproj\utils\FilmDAO.class
+com\cineproj\utils\UserDAO.class
+com\cineproj\utils\ProjectionDAO.class
 com\cineproj\api\ProjectionService.class
+com\cineproj\utils\CinemaDAO.class
 com\cineproj\request\AuthRequest.class
 com\cineproj\api\FilmService.class
 com\cineproj\utils\Database.class
@@ -9,3 +12,4 @@ com\cineproj\api\AuthService.class
 com\cineproj\model\Cinema.class
 com\cineproj\model\Projection.class
 com\cineproj\api\HelloResource.class
+com\cineproj\model\User.class

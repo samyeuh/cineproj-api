@@ -1,6 +1,8 @@
 package com.cineproj.api;
 
+import com.cineproj.model.User;
 import com.cineproj.request.AuthRequest;
+import com.cineproj.utils.UserDAO;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -10,33 +12,45 @@ import javax.ws.rs.core.Response;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class AuthService {
+	
+	public UserDAO userDAO = new UserDAO();
 
     @POST
     @Path("/login")
     public Response login(AuthRequest request) {
-    	if (request == null) {
-    	    return Response.status(Response.Status.BAD_REQUEST)
-    	                   .entity("{\"message\":\"Missing JSON body\"}")
-    	                   .build();
+    	try {
+    		User user = new User();
+    		user.setUsername(request.getUsername());
+    		user.setPassword(request.getPassword());
+    		
+    		userDAO.login(user);
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		return Response.status(Response.Status.BAD_REQUEST)
+    				.entity("{\"error\":\"" + e.getMessage() + "\"}")
+    				.build();
     	}
-        String username = request.getUsername();
-        String password = request.getPassword();
-
-        if ("admin".equals(username) && "1234".equals(password)) {
-            return Response.ok("{\"message\":\"Login successful\"}").build();
-        } else {
-            return Response.status(Response.Status.UNAUTHORIZED)
-                           .entity("{\"message\":\"Invalid credentials\"}")
-                           .build();
-        }
+    	
+    	return Response.ok().build();
     }
 
     @POST
     @Path("/register")
     public Response register(AuthRequest request) {
-        String username = request.getUsername();
-        String password = request.getPassword();
-
+    	// TODO: à crypter !
+        try {
+        	User user = new User();
+        	user.setUsername(request.getUsername());
+        	user.setPassword(request.getPassword());
+        	
+        	userDAO.register(user);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	return Response.status(Response.Status.BAD_REQUEST)
+        			.entity("{\"error\":\"" + e.getMessage() + "\"}")
+	                   .build();
+        }
+        
         return Response.status(Response.Status.CREATED)
                        .entity("{\"message\":\"User registered\"}")
                        .build();
