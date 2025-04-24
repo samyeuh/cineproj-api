@@ -31,7 +31,7 @@ public class AuthService {
     				.build();
     	}
     	
-    	return Response.ok().build();
+    	return Response.ok().entity("{\"message\":\"Login successful\"}").build();
     }
 
     @POST

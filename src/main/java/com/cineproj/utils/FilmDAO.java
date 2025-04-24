@@ -11,7 +11,6 @@ import java.util.UUID;
 
 public class FilmDAO {
 
-    // Insert un film dans Supabase
     public void insertFilm(Film film) throws SQLException {
         String sql = "INSERT INTO films (titre, duree_en_minute, lang, soustitres, realisateur, acteurs, age_min) " +
                      "VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id";
@@ -33,60 +32,52 @@ public class FilmDAO {
             film.setId(generatedId);
         }
 
-        } 
+     } 
+    
+	public List<Film> searchFilms(String id, String titre, String lang, String realisateur, Integer ageMin, Integer ageMax, String soustitres, Integer dureeMin, Integer dureeMax) throws SQLException {
+	    List<Film> films = new ArrayList<>();
+	    StringBuilder sql = new StringBuilder("SELECT * FROM films WHERE 1=1");
+	    
+	    if (id != null && !id.trim().isEmpty()) sql.append(" AND id = ?");
+	    if (titre != null && !titre.trim().isEmpty()) sql.append(" AND LOWER(titre) LIKE LOWER(?)");
+	    if (lang != null && !lang.trim().isEmpty()) sql.append(" AND LOWER(lang) = LOWER(?)");
+	    if (realisateur != null && !realisateur.trim().isEmpty()) sql.append(" AND LOWER(realisateur) LIKE LOWER(?)");
+	    if (ageMin != null) sql.append(" AND age_min >= ?");
+	    if (ageMax != null) sql.append(" AND age_min <= ?");
+	    if (soustitres != null && !soustitres.trim().isEmpty()) sql.append(" AND LOWER(soustitres) = LOWER(?)");
+	    if (dureeMin != null) sql.append(" AND duree_en_minute >= ?");
+	    if (dureeMax != null) sql.append(" AND duree_en_minute <= ?");
 
-    public List<Film> getAllFilms() throws SQLException {
-        List<Film> films = new ArrayList<>();
-        String sql = "SELECT * FROM films";
+	    Connection conn = Database.getConnection();
+	    PreparedStatement stmt = conn.prepareStatement(sql.toString());
 
-        Connection conn = Database.getConnection();
-        Statement stmt = conn.createStatement();
-        ResultSet rs = stmt.executeQuery(sql);
+	    int i = 1;
+	    if (id != null && !id.trim().isEmpty()) stmt.setObject(i++, UUID.fromString(id.trim()));
+	    if (titre != null && !titre.trim().isEmpty()) stmt.setString(i++, "%" + titre.trim() + "%");
+	    if (lang != null && !lang.trim().isEmpty()) stmt.setString(i++, lang);
+	    if (realisateur != null && !realisateur.trim().isEmpty()) stmt.setString(i++, "%" + realisateur + "%");
+	    if (ageMin != null) stmt.setInt(i++, ageMin);
+	    if (ageMax != null) stmt.setInt(i++, ageMax);
+	    if (soustitres != null && !soustitres.trim().isEmpty()) stmt.setString(i++, soustitres);
+	    if (dureeMin != null) stmt.setInt(i++, dureeMin);
+	    if (dureeMax != null) stmt.setInt(i++, dureeMax);
 
-        while (rs.next()) {
-            Film film = new Film();
-            film.setId(UUID.fromString(rs.getString("id")));
-            film.setTitre(rs.getString("titre"));
-            film.setDureeEnMinute(rs.getInt("duree_en_minute"));
-            film.setLang(rs.getString("lang"));
-            film.setSoustitres(rs.getString("soustitres"));
-            film.setRealisateur(rs.getString("realisateur"));
-            String acteursStr = rs.getString("acteurs");
-            film.setActeurs(Arrays.asList(acteursStr.split(",")));
-            film.setAgeMin(rs.getInt("age_min"));
+	    ResultSet rs = stmt.executeQuery();
+	    while (rs.next()) {
+	        Film film = new Film();
+	        film.setId(UUID.fromString(rs.getString("id")));
+	        film.setTitre(rs.getString("titre"));
+	        film.setDureeEnMinute(rs.getInt("duree_en_minute"));
+	        film.setLang(rs.getString("lang"));
+	        film.setSoustitres(rs.getString("soustitres"));
+	        film.setRealisateur(rs.getString("realisateur"));
+	        String acteursStr = rs.getString("acteurs");
+	        film.setActeurs(Arrays.asList(acteursStr.split(",")));
+	        film.setAgeMin(rs.getInt("age_min"));
 
-            films.add(film);
-        }
-
-        return films;
-    }
-
-	public Film getFilmById(UUID filmId) throws SQLException {
-		List<Film> films = new ArrayList<>();
-		String sql = "SELECT * FROM films WHERE id = ?";
-		
-		Connection conn = Database.getConnection();
-		PreparedStatement stmt = conn.prepareStatement(sql);
-		
-		stmt.setString(1, filmId.toString());
-		
-		ResultSet rs = stmt.executeQuery();
-		
-		while (rs.next()) {
-			Film film = new Film();
-            film.setId(UUID.fromString(rs.getString("id")));
-            film.setTitre(rs.getString("titre"));
-            film.setDureeEnMinute(rs.getInt("duree_en_minute"));
-            film.setLang(rs.getString("lang"));
-            film.setSoustitres(rs.getString("soustitres"));
-            film.setRealisateur(rs.getString("realisateur"));
-            String acteursStr = rs.getString("acteurs");
-            film.setActeurs(Arrays.asList(acteursStr.split(",")));
-            film.setAgeMin(rs.getInt("age_min"));
-            
-            films.add(film);
-		}
-		
-		return films.get(0);
+	        films.add(film);
+	    }
+	    	
+	    return films;
 	}
 }

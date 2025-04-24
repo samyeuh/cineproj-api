@@ -16,7 +16,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ProjectionDAO {
-
+	// TODO
     private ObjectMapper mapper = new ObjectMapper();
 
     // INSERT
@@ -73,7 +73,7 @@ public class ProjectionDAO {
         UUID filmId = UUID.fromString(rs.getString("film_id"));
         UUID cinemaId = UUID.fromString(rs.getString("cinema_id"));
 
-        projection.setFilm(new FilmDAO().getFilmById(filmId));
+        projection.setFilm(new FilmDAO().searchFilms(filmId.toString(), null, null, null, null, null, null, null, null).get(0));
         projection.setCinema(new CinemaDAO().getCinemaById(cinemaId));
 
         projection.setDateDebut(rs.getDate("date_debut").toLocalDate());

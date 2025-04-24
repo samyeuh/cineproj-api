@@ -8,11 +8,13 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import com.cineproj.model.Cinema;
+import com.cineproj.request.CinemaSearchRequest;
 import com.cineproj.utils.CinemaDAO;
 
 @Path("/cinemas")
@@ -23,6 +25,7 @@ public class CinemaService {
 	public CinemaDAO cinemaDAO = new CinemaDAO();
 	
 	@POST
+	@Path("/add")
 	public Response addCinema(Cinema cinema) {
 		try {
 			cinemaDAO.insertCinema(cinema);
@@ -36,23 +39,8 @@ public class CinemaService {
 	}
 	
 	@GET
-	public Response getAllCinemas() {
-		List<Cinema> cinemas = new ArrayList<>();
-		try {
-			cinemas = cinemaDAO.getAllCinemas();
-		} catch (Exception e) {
-			e.printStackTrace();
-		    return Response.status(Response.Status.BAD_REQUEST)
-		                   .entity("{\"error\":\"" + e.getMessage() + "\"}")
-		                   .build();
-		}
-		
-		return Response.ok().entity(cinemas).build();
-	}
-	
-	@GET
 	@Path("/{id}")
-	public Response getCinemaById(@QueryParam("id") String id) {
+	public Response getCinemaById(@PathParam("id") String id) {
 		Cinema cinema;
 		try {
 			cinema = cinemaDAO.getCinemaById(UUID.fromString(id));
@@ -64,5 +52,25 @@ public class CinemaService {
 		}
 		
 		return Response.ok().entity(cinema).build();
+	}
+	
+	@POST
+	public Response searchCinemas(CinemaSearchRequest request) {
+		
+		try {
+			List<Cinema> cinemas = cinemaDAO.searchCinemas(
+					request.id,
+					request.name,
+					request.address,
+					request.city,
+					request.owner_id
+					);
+			return Response.ok().entity(cinemas).build();
+		} catch (Exception e) {
+			e.printStackTrace();
+		    return Response.status(Response.Status.BAD_REQUEST)
+		                   .entity("{\"error\":\"" + e.getMessage() + "\"}")
+		                   .build();
+		}
 	}
 }

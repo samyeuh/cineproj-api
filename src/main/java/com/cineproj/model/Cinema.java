@@ -6,7 +6,7 @@ public class Cinema {
 	
 	private UUID id;
 	private String name;
-	private String adresse;
+	private String address;
 	private String city;
 	private UUID owner_id;
 	
@@ -28,12 +28,12 @@ public class Cinema {
 		this.name = name;
 	}
 
-	public String getAdresse() {
-		return adresse;
+	public String getAddress() {
+		return address;
 	}
 
-	public void setAdresse(String adresse) {
-		this.adresse = adresse;
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
 	public String getCity() {

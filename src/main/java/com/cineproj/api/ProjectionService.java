@@ -11,24 +11,24 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import com.cineproj.model.Projection;
+import com.cineproj.utils.ProjectionDAO;
 
 @Path("/projections")
 @Produces("application/json")
 @Consumes("application/json")
 public class ProjectionService {
-
-	private static List<Projection> projections = new ArrayList<>();
-	private static int currentId = 1;
+	// TODO
+	private ProjectionDAO projectionDAO;
 	
 	@POST
+	@Path("/add")
 	public Response addProjection(Projection projection) {
-		projection.setId(currentId++);
-		projections.add(projection);
-		return Response.status(Response.Status.CREATED).entity(projection).build();
-	}
-	
-	@GET
-	public List<Projection> getAllProjections() {
-		return projections;
+		try {
+			projectionDAO.insertProjection(projection);
+			return Response.status(Response.Status.CREATED).entity(projection).build();
+		} catch (Exception e) {
+			return Response.status(Response.Status.BAD_REQUEST)
+					.entity("{\"error\":\"" + e.getMessage() + "\"}").build();
+		}
 	}
 }
