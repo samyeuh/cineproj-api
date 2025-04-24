@@ -1,27 +1,22 @@
 package com.cineproj.model;
 
+import java.util.UUID;
+
 public class Cinema {
 	
-	private int id;
+	private UUID id;
 	private String name;
 	private String adresse;
-	private String ville;
+	private String city;
+	private UUID owner_id;
 	
 	public Cinema() {}
-	
-	public Cinema(int id, String name, String adresse, String ville) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.adresse = adresse;
-		this.ville = ville;
-	}
 
-	public int getId() {
+	public UUID getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(UUID id) {
 		this.id = id;
 	}
 
@@ -41,13 +36,23 @@ public class Cinema {
 		this.adresse = adresse;
 	}
 
-	public String getVille() {
-		return ville;
+	public String getCity() {
+		return city;
 	}
 
-	public void setVille(String ville) {
-		this.ville = ville;
+	public void setCity(String city) {
+		this.city = city;
 	}
+
+	public UUID getOwner_id() {
+		return owner_id;
+	}
+
+	public void setOwner_id(UUID owner_id) {
+		this.owner_id = owner_id;
+	}
+	
+	
 	
 	
 

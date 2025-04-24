@@ -5,19 +5,17 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class Database {
-    private static final String URL = "jdbc:mysql://localhost:3306/cineproj_db";
-    private static final String USER = "root";
-    private static final String PASSWORD = ""; 
+    private static final String URL = "jdbc:postgresql://db.ipyxrmnqjulutxucexmg.supabase.co:5432/postgres?user=postgres&password=3RrcNuGDKWxZrBJy";
 
     static {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver"); // Charge le driver
+        	Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
 
     public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL, USER, PASSWORD);
+        return DriverManager.getConnection(URL);
     }
 }
