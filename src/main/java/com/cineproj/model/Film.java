@@ -6,12 +6,12 @@ import java.util.UUID;
 public class Film {
     private UUID id;
     private String titre;
-    private int dureeEnMinute;
+    private Integer dureeEnMinute;
     private String lang;
     private String soustitres;
     private String realisateur;
     private List<String> acteurs;
-    private int ageMin;
+    private Integer ageMin;
     
     public Film() {}
     
@@ -27,10 +27,10 @@ public class Film {
 	public void setTitre(String titre) {
 		this.titre = titre;
 	}
-	public int getDureeEnMinute() {
+	public Integer getDureeEnMinute() {
 		return dureeEnMinute;
 	}
-	public void setDureeEnMinute(int dureeEnMinute) {
+	public void setDureeEnMinute(Integer dureeEnMinute) {
 		this.dureeEnMinute = dureeEnMinute;
 	}
 	public String getLang() {
@@ -57,10 +57,10 @@ public class Film {
 	public void setActeurs(List<String> acteurs) {
 		this.acteurs = acteurs;
 	}
-	public int getAgeMin() {
+	public Integer getAgeMin() {
 		return ageMin;
 	}
-	public void setAgeMin(int ageMin) {
+	public void setAgeMin(Integer ageMin) {
 		this.ageMin = ageMin;
 	}
 

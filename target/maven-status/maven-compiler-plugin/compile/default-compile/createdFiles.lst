@@ -1,4 +1,5 @@
 com\cineproj\utils\FilmDAO.class
+com\cineproj\request\ProjectionSearchRequest.class
 com\cineproj\utils\UserDAO.class
 com\cineproj\utils\ProjectionDAO.class
 com\cineproj\api\ProjectionService.class

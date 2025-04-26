@@ -2,21 +2,31 @@ package com.cineproj.model;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Projection {
 	
-	private int id;
+	private UUID id;
 	private Film film;
 	private Cinema cinema;
+	
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private LocalDate dateDebut;
+
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private LocalDate dateFin;
+	
 	private Map<String, List<LocalTime>> calendrier;
 	
 	public Projection() {}
 	
-	public Projection(int id, Film film, Cinema cinema, LocalDate dateDebut, LocalDate dateFin,
+	public Projection(UUID id, Film film, Cinema cinema, LocalDate dateDebut, LocalDate dateFin,
 			Map<String, List<LocalTime>> calendrier) {
 		super();
 		this.id = id;
@@ -27,11 +37,11 @@ public class Projection {
 		this.calendrier = calendrier;
 	}
 
-	public int getId() {
+	public UUID getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(UUID id) {
 		this.id = id;
 	}
 
@@ -51,23 +61,40 @@ public class Projection {
 		this.cinema = cinema;
 	}
 
-	public LocalDate getDateDebut() {
-		return dateDebut;
+	public String getDateDebut() {
+		return dateDebut == null ? null : dateDebut.toString();
 	}
 
 	public void setDateDebut(LocalDate dateDebut) {
 		this.dateDebut = dateDebut;
 	}
 
-	public LocalDate getDateFin() {
-		return dateFin;
+	public String getDateFin() {
+		return dateFin == null ? null : dateFin.toString();
 	}
 
 	public void setDateFin(LocalDate dateFin) {
 		this.dateFin = dateFin;
 	}
 
-	public Map<String, List<LocalTime>> getCalendrier() {
+	public Map<String, List<String>> getCalendrier() {
+	    if (calendrier == null) return null;
+
+	    Map<String, List<String>> calendrierFormatte = new HashMap<>();
+
+	    for (Map.Entry<String, List<LocalTime>> entry : calendrier.entrySet()) {
+	        List<String> horaires = new ArrayList<>();
+	        for (LocalTime time : entry.getValue()) {
+	            horaires.add(time.toString().substring(0,5)); // Ex: "18:00"
+	        }
+	        calendrierFormatte.put(entry.getKey(), horaires);
+	    }
+
+	    return calendrierFormatte;
+	}
+	
+	@JsonIgnore
+	public Map<String, List<LocalTime>> getRawCalendrier(){
 		return calendrier;
 	}
 

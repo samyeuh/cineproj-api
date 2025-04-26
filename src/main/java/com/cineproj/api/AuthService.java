@@ -2,7 +2,7 @@ package com.cineproj.api;
 
 import com.cineproj.model.User;
 import com.cineproj.request.AuthRequest;
-import com.cineproj.utils.UserDAO;
+import com.cineproj.utils.AuthDAO;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -13,7 +13,7 @@ import javax.ws.rs.core.Response;
 @Consumes(MediaType.APPLICATION_JSON)
 public class AuthService {
 	
-	public UserDAO userDAO = new UserDAO();
+	public AuthDAO userDAO = new AuthDAO();
 
     @POST
     @Path("/login")
@@ -37,7 +37,7 @@ public class AuthService {
     @POST
     @Path("/register")
     public Response register(AuthRequest request) {
-    	// TODO: à crypter !
+    	// TODO: ï¿½ crypter !
         try {
         	User user = new User();
         	user.setUsername(request.getUsername());

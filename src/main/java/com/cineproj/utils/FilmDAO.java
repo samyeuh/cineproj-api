@@ -32,7 +32,42 @@ public class FilmDAO {
             film.setId(generatedId);
         }
 
-     } 
+     }
+    
+    public void updateFilm(Film film) throws SQLException {
+        String sql = "UPDATE films SET titre = ?, duree_en_minute = ?, lang = ?, soustitres = ?, realisateur = ?, acteurs = ?, age_min = ? WHERE id = ?";
+
+		Connection conn = Database.getConnection();
+	    PreparedStatement stmt = conn.prepareStatement(sql); 
+		
+	    stmt.setString(1, film.getTitre());
+	    stmt.setInt(2, film.getDureeEnMinute());
+	    stmt.setString(3, film.getLang());
+	    stmt.setString(4, film.getSoustitres());
+	    stmt.setString(5, film.getRealisateur());
+	    stmt.setString(6, String.join(",", film.getActeurs()));
+		stmt.setInt(7, film.getAgeMin());
+		stmt.setObject(8, film.getId());
+		
+		stmt.executeUpdate();
+    }
+    
+    public void deleteFilm(String id) throws SQLException {
+        String sql = "DELETE FROM films WHERE id = ?";
+
+        Connection conn = Database.getConnection();
+        PreparedStatement stmt = conn.prepareStatement(sql);
+
+        stmt.setObject(1, UUID.fromString(id.trim()));
+        stmt.executeUpdate();
+    }
+
+
+    
+    public Film getFilmById(String id) throws SQLException {
+		List<Film> films = searchFilms(id, null, null, null, null, null, null, null, null);
+		return films.get(0);
+    }
     
 	public List<Film> searchFilms(String id, String titre, String lang, String realisateur, Integer ageMin, Integer ageMax, String soustitres, Integer dureeMin, Integer dureeMax) throws SQLException {
 	    List<Film> films = new ArrayList<>();
