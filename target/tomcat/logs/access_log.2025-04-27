@@ -1,6 +1,9 @@
-0:0:0:0:0:0:0:1 - - [27/Apr/2025:00:22:58 +0200] "PUT /CINEPROJ/api/projections/3738b374-8a9c-496e-b9c9-3f8e0bbdfad6 HTTP/1.1" 404 32 http-bio-8080-exec-2 2005
-0:0:0:0:0:0:0:1 - - [27/Apr/2025:00:23:16 +0200] "PUT /CINEPROJ/api/projections/bfe7b2ed-e8ea-4940-8956-dcd921bde6e5 HTTP/1.1" 404 32 http-bio-8080-exec-3 1327
-0:0:0:0:0:0:0:1 - - [27/Apr/2025:00:23:48 +0200] "POST /CINEPROJ/api/projections HTTP/1.1" 200 5682 http-bio-8080-exec-4 21977
-0:0:0:0:0:0:0:1 - - [27/Apr/2025:00:24:13 +0200] "PUT /CINEPROJ/api/projections/a10dd9d8-30b8-4adf-a254-cb3197e0caf3 HTTP/1.1" 200 706 http-bio-8080-exec-5 7093
-0:0:0:0:0:0:0:1 - - [27/Apr/2025:00:24:28 +0200] "DELETE /CINEPROJ/api/projections/a10dd9d8-30b8-4adf-a254-cb3197e0caf3 HTTP/1.1" 200 45 http-bio-8080-exec-6 5242
-0:0:0:0:0:0:0:1 - - [27/Apr/2025:00:26:30 +0200] "POST /CINEPROJ/api/auth/register HTTP/1.1" 201 29 http-bio-8080-exec-9 1450
+0:0:0:0:0:0:0:1 - - [27/Apr/2025:18:28:45 +0200] "POST /CINEPROJ/api/auth/login HTTP/1.1" 400 24 http-bio-8080-exec-2 1013
+0:0:0:0:0:0:0:1 - - [27/Apr/2025:18:29:14 +0200] "POST /CINEPROJ/api/auth/register HTTP/1.1" 201 29 http-bio-8080-exec-4 247
+0:0:0:0:0:0:0:1 - - [27/Apr/2025:18:29:37 +0200] "POST /CINEPROJ/api/auth/login HTTP/1.1" 200 250 http-bio-8080-exec-5 317
+0:0:0:0:0:0:0:1 - - [27/Apr/2025:18:30:37 +0200] "PUT /CINEPROJ/api/users/3a6c8ce8-0e9b-4b9b-a173-717655c4291b HTTP/1.1" 200 162 http-bio-8080-exec-6 280
+0:0:0:0:0:0:0:1 - - [27/Apr/2025:18:30:44 +0200] "PUT /CINEPROJ/api/users/3a6c8ce8-0e9b-4b9b-a173-717655c4291b HTTP/1.1" 400 127 http-bio-8080-exec-7 10
+0:0:0:0:0:0:0:1 - - [27/Apr/2025:18:30:53 +0200] "PUT /CINEPROJ/api/users/3a6c8ce8-0e9b-4b9b-a173-717655c4291b HTTP/1.1" 200 162 http-bio-8080-exec-9 250
+0:0:0:0:0:0:0:1 - - [27/Apr/2025:18:30:57 +0200] "PUT /CINEPROJ/api/users/3a6c8ce8-0e9b-4b9b-a173-717655c4291b HTTP/1.1" 401 40 http-bio-8080-exec-10 2
+0:0:0:0:0:0:0:1 - - [27/Apr/2025:18:31:22 +0200] "PUT /CINEPROJ/api/users/3a6c8ce8-0e9b-4b9b-a173-717655c4291b HTTP/1.1" 400 127 http-bio-8080-exec-10 10
+0:0:0:0:0:0:0:1 - - [27/Apr/2025:18:31:26 +0200] "PUT /CINEPROJ/api/users/3a6c8ce8-0e9b-4b9b-a173-717655c4291b HTTP/1.1" 200 162 http-bio-8080-exec-3 241

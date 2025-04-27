@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -15,9 +16,10 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import com.cineproj.dao.FilmDAO;
 import com.cineproj.model.Film;
 import com.cineproj.request.FilmSearchRequest;
-import com.cineproj.utils.FilmDAO;
+import com.cineproj.utils.TokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Path("/films")
@@ -29,8 +31,24 @@ public class FilmService {
 
 	@POST
 	@Path("/add")
-	public Response addFilm(Film film) {
+	public Response addFilm(Film film, @HeaderParam("Authorization") String authHeader) {
 		try {
+	        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+	            return Response.status(Response.Status.UNAUTHORIZED)
+	                    .entity("{\"error\":\"Authorization header missing\"}")
+	                    .build();
+	        }
+	        
+			String token = authHeader.substring("Bearer".length()).trim();
+			boolean isAdmin = TokenService.verifyTokenIsAdmin(token, false);
+
+			if (!isAdmin) {
+			    return Response.status(Response.Status.FORBIDDEN)
+			                   .entity("{\"error\":\"Unauthorized to edit this user\"}")
+			                   .build();
+			}
+			
+			
 			filmDAO.insertFilm(film);
 			return Response.status(Response.Status.CREATED).entity(film).build();
 		} catch (Exception e) {
@@ -45,8 +63,24 @@ public class FilmService {
 	
 	@PUT
 	@Path("/{id}")
-	public Response editFilm(@PathParam("id") String id, Film film) {
+	public Response editFilm(@PathParam("id") String id, Film film, @HeaderParam("Authorization") String authHeader) {
 	    try {
+	        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+	            return Response.status(Response.Status.UNAUTHORIZED)
+	                    .entity("{\"error\":\"Authorization header missing\"}")
+	                    .build();
+	        }
+	        
+			String token = authHeader.substring("Bearer".length()).trim();
+			boolean isAdmin = TokenService.verifyTokenIsAdmin(token, false);
+
+			if (!isAdmin) {
+			    return Response.status(Response.Status.FORBIDDEN)
+			                   .entity("{\"error\":\"Unauthorized to edit this user\"}")
+			                   .build();
+			}
+	    	
+	    	
 	        Film existingFilm = filmDAO.getFilmById(id);
 	        if (existingFilm == null) {
 	            return Response.status(Response.Status.NOT_FOUND)
@@ -77,8 +111,23 @@ public class FilmService {
 	
 	@DELETE
 	@Path("/{id}")
-	public Response deleteFilm(@PathParam("id") String id) {
+	public Response deleteFilm(@PathParam("id") String id, @HeaderParam("Authorization") String authHeader) {
 	    try {
+	        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+	            return Response.status(Response.Status.UNAUTHORIZED)
+	                    .entity("{\"error\":\"Authorization header missing\"}")
+	                    .build();
+	        }
+	        
+			String token = authHeader.substring("Bearer".length()).trim();
+			boolean isAdmin = TokenService.verifyTokenIsAdmin(token, false);
+
+			if (!isAdmin) {
+			    return Response.status(Response.Status.FORBIDDEN)
+			                   .entity("{\"error\":\"Unauthorized to edit this user\"}")
+			                   .build();
+			}
+	    	
 	        Film film = filmDAO.getFilmById(id);
 	        if (film == null) {
 	            return Response.status(Response.Status.NOT_FOUND)

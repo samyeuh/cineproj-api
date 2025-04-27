@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -17,11 +18,12 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import com.cineproj.dao.CinemaDAO;
+import com.cineproj.dao.FilmDAO;
+import com.cineproj.dao.ProjectionDAO;
 import com.cineproj.model.Projection;
 import com.cineproj.request.ProjectionSearchRequest;
-import com.cineproj.utils.CinemaDAO;
-import com.cineproj.utils.FilmDAO;
-import com.cineproj.utils.ProjectionDAO;
+import com.cineproj.utils.TokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Path("/projections")
@@ -35,9 +37,24 @@ public class ProjectionService {
 	
 	@POST
 	@Path("/add")
-	public Response addProjection(Projection projection) {
+	public Response addProjection(Projection projection, @HeaderParam("Authorization") String authHeader) {
 	    try {
-	        // Convertir le calendrier de String vers LocalTime
+	    	if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+	            return Response.status(Response.Status.UNAUTHORIZED)
+	                    .entity("{\"error\":\"Authorization header missing\"}")
+	                    .build();
+	        }
+	        
+			String token = authHeader.substring("Bearer".length()).trim();
+			boolean isAdmin = TokenService.verifyTokenIsAdmin(token, false);
+			boolean isCinema = TokenService.verifyTokenIsCinema(token, false);
+
+			if (!isAdmin && !isCinema) {
+			    return Response.status(Response.Status.FORBIDDEN)
+			                   .entity("{\"error\":\"Unauthorized to edit this user\"}")
+			                   .build();
+			}
+	    	
 	        if (projection.getCalendrier() != null) {
 	            Map<String, List<LocalTime>> calendrierConverted = new HashMap<>();
 	            for (Map.Entry<String, List<String>> entry : projection.getCalendrier().entrySet()) {
@@ -62,16 +79,32 @@ public class ProjectionService {
 	
 	@PUT
 	@Path("/{id}")
-	public Response editProjection(@PathParam("id") String id, Projection projection) {
+	public Response editProjection(@PathParam("id") String id, Projection projection, @HeaderParam("Authorization") String authHeader) {
 	    try {
 	        Projection existingProjection = projectionDAO.getProjectionById(id);
+	        
+	    	if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+	            return Response.status(Response.Status.UNAUTHORIZED)
+	                    .entity("{\"error\":\"Authorization header missing\"}")
+	                    .build();
+	        }
+	        
+			String token = authHeader.substring("Bearer".length()).trim();
+			String user = TokenService.getUserId(token);
+			boolean isAdmin = TokenService.verifyTokenIsAdmin(token, false);
+
+			if (!isAdmin && !user.equals(existingProjection.getCinema().getOwner_id().toString())) {
+			    return Response.status(Response.Status.FORBIDDEN)
+			                   .entity("{\"error\":\"Unauthorized to edit this user\"}")
+			                   .build();
+			}
+			
 	        if (existingProjection == null) {
 	            return Response.status(Response.Status.NOT_FOUND)
 	                           .entity("{\"error\":\"Projection not found\"}")
 	                           .build();
 	        }
 
-	        // Sécurise la mise à jour uniquement si les champs sont présents
 	        if (projection.getFilm() != null && projection.getFilm().getId() != null) {
 	            existingProjection.setFilm(filmDAO.getFilmById(projection.getFilm().getId().toString()));
 	        }
@@ -113,9 +146,26 @@ public class ProjectionService {
 	
 	@DELETE
 	@Path("/{id}")
-	public Response deleteProjection(@PathParam("id") String id) {
+	public Response deleteProjection(@PathParam("id") String id, @HeaderParam("Authorization") String authHeader) {
 	    try {
 	        Projection existingProjection = projectionDAO.getProjectionById(id);
+	        
+	    	if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+	            return Response.status(Response.Status.UNAUTHORIZED)
+	                    .entity("{\"error\":\"Authorization header missing\"}")
+	                    .build();
+	        }
+	        
+			String token = authHeader.substring("Bearer".length()).trim();
+			String user = TokenService.getUserId(token);
+			boolean isAdmin = TokenService.verifyTokenIsAdmin(token, false);
+
+			if (!isAdmin && !user.equals(existingProjection.getCinema().getOwner_id().toString())) {
+			    return Response.status(Response.Status.FORBIDDEN)
+			                   .entity("{\"error\":\"Unauthorized to edit this user\"}")
+			                   .build();
+			}
+			
 	        if (existingProjection == null) {
 	            return Response.status(Response.Status.NOT_FOUND)
 	                           .entity("{\"error\":\"Projection not found\"}")
