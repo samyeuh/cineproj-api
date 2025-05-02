@@ -8,7 +8,7 @@ RUN mvn clean package -DskipTests
 FROM tomcat:9.0
 
 # Changer le port HTTP de Tomcat à 80
-RUN sed -i 's/Connector port="8080"/Connector port="80"/' /usr/local/tomcat/conf/server.xml
+RUN sed -i 's/Connector port="8080"/Connector port="${PORT}"/' /usr/local/tomcat/conf/server.xml
 
 # Déploiement du WAR
 COPY --from=builder /app/target/CINEPROJ.war /usr/local/tomcat/webapps/ROOT.war
