@@ -1,7 +1,5 @@
 package com.cineproj.request;
 
-import java.util.UUID;
-
 public class UserRequest {
 	
     private String id;

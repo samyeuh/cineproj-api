@@ -1,14 +1,11 @@
 package com.cineproj.dao;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.Calendar;
 import java.util.UUID;
 
 import org.springframework.security.crypto.bcrypt.BCrypt;

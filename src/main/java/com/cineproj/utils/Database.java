@@ -4,8 +4,19 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
 public class Database {
-    private static final String URL = "jdbc:postgresql://db.ipyxrmnqjulutxucexmg.supabase.co:5432/postgres?user=postgres&password=3RrcNuGDKWxZrBJy";
+    
+    private static final String URL;
+
+    static {
+        Dotenv dotenv = Dotenv.load(); // charge le fichier .env automatiquement
+        URL = dotenv.get("DB_URL");
+        if (URL == null) {
+            throw new RuntimeException("DB_URL is not set in .env");
+        }
+    }
 
     static {
         try {

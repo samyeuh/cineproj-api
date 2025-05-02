@@ -103,6 +103,12 @@
 		    <artifactId>spring-security-crypto</artifactId>
 		    <version>5.8.5</version> <!-- version stable compatible Java 8 -->
 		</dependency>
+		
+		<dependency>
+		    <groupId>io.github.cdimascio</groupId>
+		    <artifactId>dotenv-java</artifactId>
+		    <version>2.2.4</version>
+		</dependency>
 
     </dependencies>
 

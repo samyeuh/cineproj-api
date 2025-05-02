@@ -1,13 +1,6 @@
 package com.cineproj.request;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import com.cineproj.model.Cinema;
-import com.cineproj.model.Film;
 
 public class ProjectionSearchRequest {
 	public String id;
