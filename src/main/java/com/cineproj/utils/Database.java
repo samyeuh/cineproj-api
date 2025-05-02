@@ -11,8 +11,7 @@ public class Database {
     private static final String URL;
 
     static {
-        Dotenv dotenv = Dotenv.load();
-        URL = dotenv.get("DB_URL");
+        URL = System.getenv("DB_URL");
         if (URL == null) {
             throw new RuntimeException("DB_URL is not set in .env");
         }
