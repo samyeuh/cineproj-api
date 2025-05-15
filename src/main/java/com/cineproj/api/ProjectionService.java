@@ -56,11 +56,11 @@ public class ProjectionService {
 			}
 	    	
 	        if (projection.getCalendrier() != null) {
-	            Map<String, List<LocalTime>> calendrierConverted = new HashMap<>();
+	            Map<String, List<String>> calendrierConverted = new HashMap<>();
 	            for (Map.Entry<String, List<String>> entry : projection.getCalendrier().entrySet()) {
-	                List<LocalTime> horaires = new ArrayList<>();
+	                List<String> horaires = new ArrayList<>();
 	                for (String heureStr : entry.getValue()) {
-	                    horaires.add(LocalTime.parse(heureStr));
+	                    horaires.add(heureStr);
 	                }
 	                calendrierConverted.put(entry.getKey(), horaires);
 	            }
@@ -112,18 +112,18 @@ public class ProjectionService {
 	            existingProjection.setCinema(cinemaDAO.getCinemaById(projection.getCinema().getId().toString()));
 	        }
 	        if (projection.getDateDebut() != null) {
-	            existingProjection.setDateDebut(LocalDate.parse(projection.getDateDebut()));
+	            existingProjection.setDateDebut(projection.getDateDebut());
 	        }
 	        if (projection.getDateFin() != null) {
-	            existingProjection.setDateFin(LocalDate.parse(projection.getDateFin()));
+	            existingProjection.setDateFin(projection.getDateFin());
 	        }
 	        if (projection.getCalendrier() != null && !projection.getCalendrier().isEmpty()) {
-	            Map<String, List<LocalTime>> calendrierConverted = new HashMap<>();
+	            Map<String, List<String>> calendrierConverted = new HashMap<>();
 	            for (Map.Entry<String, List<String>> entry : projection.getCalendrier().entrySet()) {
-	                List<LocalTime> horaires = new ArrayList<>();
+	                List<String> horaires = new ArrayList<>();
 	                for (String heureStr : entry.getValue()) {
 	                    if (heureStr != null && !heureStr.trim().isEmpty()) {
-	                        horaires.add(LocalTime.parse(heureStr));
+	                        horaires.add(heureStr);
 	                    }
 	                }
 	                calendrierConverted.put(entry.getKey(), horaires);

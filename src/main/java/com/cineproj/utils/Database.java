@@ -4,15 +4,15 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
 public class Database {
     
-    private static final String URL;
+    private static String URL;
 
     static {
-        URL = System.getenv("DB_URL");
-        if (URL == null) {
-            throw new RuntimeException("DB_URL is not set in .env");
-        }
+    	Dotenv dotenv = Dotenv.load();
+        URL = System.getenv("DB_URL") == null ? URL = dotenv.get("DB_URL") : System.getenv("DB_URL");
     }
 
     static {

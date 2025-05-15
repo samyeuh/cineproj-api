@@ -61,7 +61,6 @@ public class AuthService {
     @POST
     @Path("/register")
     public Response register(AuthRequest request) {
-    	// TODO: � crypter !
         try {
         	User user = new User();
         	user.setUsername(request.getUsername());

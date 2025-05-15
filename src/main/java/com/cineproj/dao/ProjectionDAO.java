@@ -20,79 +20,99 @@ public class ProjectionDAO {
     public FilmDAO filmDAO = new FilmDAO();
     public CinemaDAO cinemaDAO = new CinemaDAO();
 
-    public void insertProjection(Projection projection) throws SQLException, JsonProcessingException {
-        String sql = "INSERT INTO projection (film_id, cinema_id, date_debut, date_fin, calendrier) " +
-                     "VALUES (?, ?, ?, ?, ?) RETURNING id";
+    public void insertProjection(Projection projection) throws SQLException {
+        String sql = "INSERT INTO projections (film_id, cinema_id, start_date, end_date) VALUES (?, ?, ?, ?) RETURNING id";
 
-        Connection conn = Database.getConnection();
-        PreparedStatement stmt = conn.prepareStatement(sql);
+        try(Connection conn = Database.getConnection();
+        PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-        stmt.setObject(1, projection.getFilm());
-        stmt.setObject(2, projection.getCinema());
-        stmt.setDate(3, Date.valueOf(projection.getDateDebut()));
-        stmt.setDate(4, Date.valueOf(projection.getDateFin()));
-
-        PGobject jsonObject = new PGobject();
-        jsonObject.setType("jsonb");
-        jsonObject.setValue(mapper.writeValueAsString(projection.getCalendrier()));
-        stmt.setObject(5, jsonObject);
-
-        ResultSet rs = stmt.executeQuery();
-        if (rs.next()) {
-            projection.setId(UUID.fromString(rs.getString("id")));
+	        stmt.setObject(1, projection.getFilm().getId());
+	        stmt.setObject(2, projection.getCinema().getId());
+	        stmt.setDate(3, java.sql.Date.valueOf(projection.getDateDebut()));
+	        stmt.setDate(4, java.sql.Date.valueOf(projection.getDateFin()));
+	
+	        try(ResultSet rs = stmt.executeQuery()){
+		        if (rs.next()) {
+		            projection.setId(UUID.fromString(rs.getString("id")));
+		        }
+	        }
+	
+	        // Insertion dans projection_schedule
+	        if (projection.getRawCalendrier() != null) {
+	            String scheduleSql = "INSERT INTO projection_schedule (projection_id, day_of_week, hour) VALUES (?, ?, ?)";
+	            try(PreparedStatement ps = conn.prepareStatement(scheduleSql)){
+	
+		            for (Map.Entry<String, List<String>> entry : projection.getRawCalendrier().entrySet()) {
+		                for (String time : entry.getValue()) {
+		                    ps.setObject(1, projection.getId());
+		                    ps.setString(2, entry.getKey().toLowerCase());
+		                    LocalTime t = LocalTime.parse(time);
+		                    ps.setTime(3, Time.valueOf(t));
+		                    ps.addBatch();
+		                }
+		            }
+		            ps.executeBatch();
+		        }
+	        }
         }
     }
     
     public void updateProjection(Projection projection) throws SQLException, JsonProcessingException {
         Connection conn = Database.getConnection();
 
-        // Vérifier si le film existe
-        PreparedStatement filmCheckStmt = conn.prepareStatement("SELECT id FROM films WHERE id = ?");
-        filmCheckStmt.setObject(1, projection.getFilm().getId());
-        ResultSet filmCheckRs = filmCheckStmt.executeQuery();
-        if (!filmCheckRs.next()) {
-            throw new IllegalArgumentException("Film ID does not exist in the database.");
+        try(PreparedStatement filmCheckStmt = conn.prepareStatement("SELECT id FROM films WHERE id = ?")) {
+        	filmCheckStmt.setObject(1, projection.getFilm().getId());
+	        try(ResultSet filmCheckRs = filmCheckStmt.executeQuery()){
+		        if (!filmCheckRs.next()) {
+		            throw new IllegalArgumentException("Film ID does not exist in the database.");
+		        }
+	        }
         }
 
         // Vérifier si le cinema existe
-        PreparedStatement cinemaCheckStmt = conn.prepareStatement("SELECT id FROM cinemas WHERE id = ?");
-        cinemaCheckStmt.setObject(1, projection.getCinema().getId());
-        ResultSet cinemaCheckRs = cinemaCheckStmt.executeQuery();
-        if (!cinemaCheckRs.next()) {
-            throw new IllegalArgumentException("Cinema ID does not exist in the database.");
+        try(PreparedStatement cinemaCheckStmt = conn.prepareStatement("SELECT id FROM cinemas WHERE id = ?")){
+        	cinemaCheckStmt.setObject(1, projection.getCinema().getId());
+	        try(ResultSet cinemaCheckRs = cinemaCheckStmt.executeQuery()){
+		        if (!cinemaCheckRs.next()) {
+		            throw new IllegalArgumentException("Cinema ID does not exist in the database.");
+		        }
+	        }
         }
 
         
         String updateProjectionSql = "UPDATE projections SET film_id = ?, cinema_id = ?, start_date = ?, end_date = ? WHERE id = ?";
-        PreparedStatement stmt = conn.prepareStatement(updateProjectionSql);
-        stmt.setObject(1, projection.getFilm().getId());
-        stmt.setObject(2, projection.getCinema().getId());
-        stmt.setDate(3, Date.valueOf(projection.getDateDebut()));
-        stmt.setDate(4, Date.valueOf(projection.getDateFin()));
-        stmt.setObject(5, projection.getId());
-        stmt.executeUpdate();
+        try(PreparedStatement stmt = conn.prepareStatement(updateProjectionSql)){
+	        stmt.setObject(1, projection.getFilm().getId());
+	        stmt.setObject(2, projection.getCinema().getId());
+	        stmt.setString(3, projection.getDateDebut());
+	        stmt.setString(4, projection.getDateFin());
+	        stmt.setObject(5, projection.getId());
+	        stmt.executeUpdate();
+        }
 
         
-        PreparedStatement stmt2 = conn.prepareStatement("DELETE FROM projection_schedule WHERE projection_id = ?");
-        stmt2.setObject(1, projection.getId());
-        stmt2.executeUpdate();
+        try(PreparedStatement stmt2 = conn.prepareStatement("DELETE FROM projection_schedule WHERE projection_id = ?")){
+	        stmt2.setObject(1, projection.getId());
+	        stmt2.executeUpdate();
+        }
 
         
         if (projection.getCalendrier() != null && !projection.getCalendrier().isEmpty()) {
             String insertScheduleSql = "INSERT INTO projection_schedule (projection_id, day_of_week, hour) VALUES (?, ?, ?)";
-            PreparedStatement stmt3 = conn.prepareStatement(insertScheduleSql);
-            for (Map.Entry<String, List<LocalTime>> entry : projection.getRawCalendrier().entrySet()) {
-                String day = entry.getKey();
-                for (LocalTime time : entry.getValue()) {
-                    if (time != null) {
-                        stmt3.setObject(1, projection.getId());
-                        stmt3.setString(2, day.toLowerCase());
-                        stmt3.setTime(3, java.sql.Time.valueOf(time));
-                        stmt3.addBatch();
-                    }
-                }
+            try(PreparedStatement stmt3 = conn.prepareStatement(insertScheduleSql)) {
+	            for (Map.Entry<String, List<String>> entry : projection.getRawCalendrier().entrySet()) {
+	                String day = entry.getKey();
+	                for (String time : entry.getValue()) {
+	                    if (time != null) {
+	                        stmt3.setObject(1, projection.getId());
+	                        stmt3.setString(2, day.toLowerCase());
+	                        stmt3.setString(3, time);
+	                        stmt3.addBatch();
+	                    }
+	                }
+	            }
+	            stmt3.executeBatch();
             }
-            stmt3.executeBatch();
         }
     }
 
@@ -100,14 +120,18 @@ public class ProjectionDAO {
     public void deleteProjection(String id) throws SQLException {
         Connection conn = Database.getConnection();
         
-        PreparedStatement stmt1 = conn.prepareStatement("DELETE FROM projection_schedule WHERE projection_id = ?");
-        stmt1.setObject(1, UUID.fromString(id.trim()));
-        stmt1.executeUpdate();
+        try(PreparedStatement stmt1 = conn.prepareStatement("DELETE FROM projection_schedule WHERE projection_id = ?")){
+        	stmt1.setObject(1, UUID.fromString(id.trim()));
+            stmt1.executeUpdate();
+        }
+        
 
         
-        PreparedStatement stmt2 = conn.prepareStatement("DELETE FROM projections WHERE id = ?");
-        stmt2.setObject(1, UUID.fromString(id.trim()));
-        stmt2.executeUpdate();
+        try(PreparedStatement stmt2 = conn.prepareStatement("DELETE FROM projections WHERE id = ?")){
+            stmt2.setObject(1, UUID.fromString(id.trim()));
+            stmt2.executeUpdate();
+        }
+
         
     }
 
@@ -135,48 +159,48 @@ public class ProjectionDAO {
     	}
     	if (hour != null && !hour.trim().isEmpty()) sql.append(" AND projection_schedule.hour = ?");
     	
-    	Connection conn = Database.getConnection();
-    	PreparedStatement stmt = conn.prepareStatement(sql.toString());
-    	
-    	int i = 1;
-    	if (id != null && !id.trim().isEmpty()) stmt.setObject(i++, UUID.fromString(id));
-    	if (film != null && !film.trim().isEmpty()) stmt.setObject(i++, UUID.fromString(film));
-    	if (cinema != null && !cinema.trim().isEmpty()) stmt.setObject(i++, UUID.fromString(cinema));
-    	if (dateDebut != null && !dateDebut.trim().isEmpty()) stmt.setDate(i++, java.sql.Date.valueOf(dateDebut));
-    	if (dateFin != null && !dateFin.trim().isEmpty()) stmt.setDate(i++, java.sql.Date.valueOf(dateFin));
-    	if (daysOfWeek != null && !daysOfWeek.isEmpty()) {
-    	    for (String day : daysOfWeek) {
-    	        stmt.setString(i++, day);
-    	    }
+    	try(Connection conn = Database.getConnection();
+    	PreparedStatement stmt = conn.prepareStatement(sql.toString())){
+    		int i = 1;
+        	if (id != null && !id.trim().isEmpty()) stmt.setObject(i++, UUID.fromString(id));
+        	if (film != null && !film.trim().isEmpty()) stmt.setObject(i++, UUID.fromString(film));
+        	if (cinema != null && !cinema.trim().isEmpty()) stmt.setObject(i++, UUID.fromString(cinema));
+        	if (dateDebut != null && !dateDebut.trim().isEmpty()) stmt.setDate(i++, java.sql.Date.valueOf(dateDebut));
+        	if (dateFin != null && !dateFin.trim().isEmpty()) stmt.setDate(i++, java.sql.Date.valueOf(dateFin));
+        	if (daysOfWeek != null && !daysOfWeek.isEmpty()) {
+        	    for (String day : daysOfWeek) {
+        	        stmt.setString(i++, day);
+        	    }
+        	}
+        	if (hour != null && !hour.trim().isEmpty()) stmt.setTime(i++, java.sql.Time.valueOf(hour));
+        	
+        	try(ResultSet rs = stmt.executeQuery()){
+	    		while (rs.next()) {
+	    	        UUID projId = UUID.fromString(rs.getString("id"));
+	    	        Projection projection = projectionMap.get(projId);
+	    	        if (projection == null) {
+	    	            projection = new Projection();
+	    	            projection.setId(projId);
+	    	            projection.setFilm(filmDAO.getFilmById(rs.getString("film_id")));
+	    	            projection.setCinema(cinemaDAO.getCinemaById(rs.getString("cinema_id")));
+	    	            projection.setDateDebut(rs.getString("start_date"));
+	    	            projection.setDateFin(rs.getString("end_date"));
+	    	            projection.setCalendrier(new HashMap<>());
+	    	            projectionMap.put(projId, projection);
+	    	        }
+	    	        
+	    		    String day = rs.getString("day_of_week");
+	    		    String timeStr = rs.getString("hour");
+	    		    if (timeStr != null) {
+	    		        projection.getRawCalendrier()
+	    		                  .computeIfAbsent(day, k -> new ArrayList<>())
+	    		                  .add(timeStr);
+	    		   }
+	    		}
+        	}
+    		
+    		return new ArrayList<>(projectionMap.values()); 	
     	}
-    	if (hour != null && !hour.trim().isEmpty()) stmt.setTime(i++, java.sql.Time.valueOf(hour));
-    	
-    	ResultSet rs = stmt.executeQuery();
-		while (rs.next()) {
-	        UUID projId = UUID.fromString(rs.getString("id"));
-	        Projection projection = projectionMap.get(projId);
-	        if (projection == null) {
-	            projection = new Projection();
-	            projection.setId(projId);
-	            projection.setFilm(filmDAO.getFilmById(rs.getString("film_id")));
-	            projection.setCinema(cinemaDAO.getCinemaById(rs.getString("cinema_id")));
-	            projection.setDateDebut(LocalDate.parse(rs.getString("start_date")));
-	            projection.setDateFin(LocalDate.parse(rs.getString("end_date")));
-	            projection.setCalendrier(new HashMap<>());
-	            projectionMap.put(projId, projection);
-	        }
-	        
-		    String day = rs.getString("day_of_week");
-		    String timeStr = rs.getString("hour");
-		    if (timeStr != null) {
-		        LocalTime time = LocalTime.parse(timeStr);
-		        projection.getRawCalendrier()
-		                  .computeIfAbsent(day, k -> new ArrayList<>())
-		                  .add(time);
-		   }
-		}
-		
-		return new ArrayList<>(projectionMap.values()); 
     }
 }
 

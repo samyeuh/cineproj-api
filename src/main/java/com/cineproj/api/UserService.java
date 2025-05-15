@@ -174,5 +174,34 @@ public class UserService {
 					.build();
 		}
 	}
+	
+	@GET
+	@Path("/me")
+	public Response getMyUser(@HeaderParam("Authorization") String authHeader) {
+		try {
+	        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+	            return Response.status(Response.Status.UNAUTHORIZED)
+	                    .entity("{\"error\":\"Authorization header missing\"}")
+	                    .build();
+	        }
+	        
+			String token = authHeader.substring("Bearer".length()).trim();
+			String userIdFromToken = TokenService.getUserId(token);
+			
+			User user = userDAO.getUserById(userIdFromToken);
+			if (user == null) {
+			    return Response.status(Response.Status.NOT_FOUND)
+			                   .entity("{\"error\":\"Utilisateur introuvable\"}")
+			                   .build();
+			}
+			
+			return Response.ok().entity(user).build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.BAD_REQUEST)
+					.entity("{\"error\":\"" + e.getMessage() + "\"}")
+					.build();
+		}
+	}
 
 }

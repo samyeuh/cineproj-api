@@ -1,13 +1,10 @@
 package com.cineproj.model;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Projection {
@@ -16,18 +13,16 @@ public class Projection {
 	private Film film;
 	private Cinema cinema;
 	
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-	private LocalDate dateDebut;
+	private String dateDebut;
 
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-	private LocalDate dateFin;
+	private String dateFin;
 	
-	private Map<String, List<LocalTime>> calendrier;
+	private Map<String, List<String>> calendrier;
 	
 	public Projection() {}
 	
-	public Projection(UUID id, Film film, Cinema cinema, LocalDate dateDebut, LocalDate dateFin,
-			Map<String, List<LocalTime>> calendrier) {
+	public Projection(UUID id, Film film, Cinema cinema, String dateDebut, String dateFin,
+			Map<String, List<String>> calendrier) {
 		super();
 		this.id = id;
 		this.film = film;
@@ -65,7 +60,7 @@ public class Projection {
 		return dateDebut == null ? null : dateDebut.toString();
 	}
 
-	public void setDateDebut(LocalDate dateDebut) {
+	public void setDateDebut(String dateDebut) {
 		this.dateDebut = dateDebut;
 	}
 
@@ -73,7 +68,7 @@ public class Projection {
 		return dateFin == null ? null : dateFin.toString();
 	}
 
-	public void setDateFin(LocalDate dateFin) {
+	public void setDateFin(String dateFin) {
 		this.dateFin = dateFin;
 	}
 
@@ -82,9 +77,9 @@ public class Projection {
 
 	    Map<String, List<String>> calendrierFormatte = new HashMap<>();
 
-	    for (Map.Entry<String, List<LocalTime>> entry : calendrier.entrySet()) {
+	    for (Map.Entry<String, List<String>> entry : calendrier.entrySet()) {
 	        List<String> horaires = new ArrayList<>();
-	        for (LocalTime time : entry.getValue()) {
+	        for (String time : entry.getValue()) {
 	            horaires.add(time.toString().substring(0,5)); // Ex: "18:00"
 	        }
 	        calendrierFormatte.put(entry.getKey(), horaires);
@@ -94,11 +89,11 @@ public class Projection {
 	}
 	
 	@JsonIgnore
-	public Map<String, List<LocalTime>> getRawCalendrier(){
+	public Map<String, List<String>> getRawCalendrier(){
 		return calendrier;
 	}
 
-	public void setCalendrier(Map<String, List<LocalTime>> calendrier) {
+	public void setCalendrier(Map<String, List<String>> calendrier) {
 		this.calendrier = calendrier;
 	}
 	

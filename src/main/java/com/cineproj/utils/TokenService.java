@@ -10,8 +10,8 @@ import java.util.Date;
 
 public class TokenService {
 
-    private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256); // Clé secrète random
-    private static final long EXPIRATION_TIME = 86400000; // 1 jour en ms
+    private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private static final long EXPIRATION_TIME = 86400000;
 
     public static String generateToken(String userId, boolean isAdmin, boolean isCinema) {
         return Jwts.builder()
