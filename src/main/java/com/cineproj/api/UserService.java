@@ -55,7 +55,7 @@ public class UserService {
 	                           .entity("{\"error\":\"User not found\"}")
 	                           .build();
 	        }
-			
+	
 			if (user.getUsername() != null) existingUser.setUsername(user.getUsername());
 			if (user.getPassword() != null) existingUser.setPassword(user.getPassword());
 			if (user.isCinema() != null) existingUser.setCinema(user.isCinema());

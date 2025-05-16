@@ -11,13 +11,29 @@ public class Database {
     private static String URL;
 
     static {
-    	Dotenv dotenv = Dotenv.load();
-        URL = System.getenv("DB_URL") == null ? URL = dotenv.get("DB_URL") : System.getenv("DB_URL");
+        try {
+            Dotenv dotenv = Dotenv.configure()
+                                  .ignoreIfMissing()
+                                  .load();
+
+            URL = System.getenv("DB_URL");
+            if (URL == null || URL.isEmpty()) {
+                URL = dotenv.get("DB_URL");
+            }
+
+            if (URL == null || URL.isEmpty()) {
+                throw new IllegalStateException("DB_URL n'est défini ni dans l'env système ni dans .env");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Erreur lors de l'initialisation de l'URL DB", e);
+        }
     }
 
     static {
         try {
-        	Class.forName("org.postgresql.Driver");
+            Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
